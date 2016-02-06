@@ -202,3 +202,68 @@ public class MyActivity extends ActionBarActivity
         super.onStart();
     }
 }
+
+// Helper classes
+class FCMLineParser
+{
+    public FCMLineParser()
+    {
+        // Initialise class variables
+        Reset();
+    }
+
+    public void Reset()
+    {
+        lineType = ' ';
+        ip = "0.0.0.0";
+        line = "";
+    }
+
+    public void SetLine(String fcmLine)
+    {
+        line = fcmLine;
+    }
+
+    // Parse a line passed in as a string
+    public void Parse(String line)
+    {
+        // If first char is a P, set type, extract IP, etc
+        lineType = line.charAt(0);
+        switch (lineType)
+        {
+            case 'P':
+                // Pub line - fine
+                break;
+            case 'S':
+                // Sub lien - fine
+                break;
+            default:
+                // Some other line
+                lineType = ' ';
+                break;
+        }
+
+        if (lineType == 'P' || lineType == 'S')
+        {
+            // Extract IP address from line.
+            // Dummy it for now.
+            ip = "192.168.2.1";
+        }
+    }
+
+    // Accessors
+    public char GetLineType()
+    {
+        return lineType;
+    }
+
+    public String GetIPAddress()
+    {
+        return ip;
+    }
+
+    // Class variables
+    protected char      lineType;
+    protected String    ip;
+    protected String    line;
+}
