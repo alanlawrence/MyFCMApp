@@ -46,6 +46,15 @@ public class MyActivity extends ActionBarActivity
         // ... so no strong typing then.
         EditText editText = (EditText) findViewById(R.id.edit_message);
         String fcmFileName = editText.getText().toString();
+
+        String message = AnalyseFCM(fcmFileName);
+
+        intent.putExtra(EXTRA_MESSAGE, message);
+        startActivity(intent);
+    }
+
+    String AnalyseFCM(String fcmFileName)
+    {
         // I am assuming that String supports copy on write. Seems to.
         String message = fcmFileName;
 
@@ -93,17 +102,6 @@ public class MyActivity extends ActionBarActivity
         // Write some data to it
         try
         {
-            //BufferedWriter fcmWriteBuf = new BufferedWriter(new FileWriter(fcmFile));
-            //fcmWriteBuf.write("Headers for FCM data");
-            //fcmWriteBuf.newLine();
-            //fcmWriteBuf.write("Then the data here.");
-            //fcmWriteBuf.newLine();
-            //Date dateNow = new Date();
-            //fcmWriteBuf.write(dateNow.toString());
-
-            // Close the file
-            //fcmWriteBuf.close();
-
             // Open the file
             BufferedReader fcmReadBuf = new BufferedReader(new FileReader(fcmFile));
             // Get the data out and add it into message.
@@ -116,14 +114,14 @@ public class MyActivity extends ActionBarActivity
             char char1;
 
             // OK, that is enough hacking. NEXT ...
-            // * Learn how to define functions on this class.
+            // * DONE. Learn how to define functions on this class.
             // * Learn how to define new classes.
             // * Create a class that extracts the pub/sub IP address
             // * Find a data structure that can store IP addresses with efficient look up
             //   i.e. if (listOfIPs.exists("10.30.75.14")) { // do stuff };
             // * And can count its entries, i.e. listOfIPs.count().
             // * Learn to write unit tests for classes written.
-            // * Learn how to use GitHub for source control.
+            // * DONE. Learn how to use GitHub for source control.
 
             while (((fcmLine = fcmReadBuf.readLine()) != null)
                     && lineNumber < MAX_LINES)
@@ -150,10 +148,8 @@ public class MyActivity extends ActionBarActivity
         {
             message = "IO exception[" + e.getMessage() + "]: " + message;
         }
-            // ********************************************************************
-
-        intent.putExtra(EXTRA_MESSAGE, message);
-        startActivity(intent);
+        // ********************************************************************
+        return message;
     }
 
     @Override
