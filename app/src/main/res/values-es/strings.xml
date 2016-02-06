@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mi FCM App</string>
+    <string name="edit_message">Escriba un mensaje, entrar si larga</string>
+    <string name="button_send">Enviar</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="title_activity_main">ActividadPrincipal</string>
+    <string name="title_activity_display_message">Mi Mensaje</string>
+
+    <string name="hello_world">Hola mundo!</string>
+</resources>
