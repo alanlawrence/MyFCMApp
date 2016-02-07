@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.TreeMap;
 
 
 public class MyActivity extends ActionBarActivity
@@ -298,3 +300,64 @@ class FCMLineParser
     protected char      lineType;
     protected String    ip;
   }
+
+// Uses a TreeMap where the key is the IP address and the value is the count
+// of those IP addresses.
+class FCMIPAddresses
+{
+    public FCMIPAddresses()
+    {
+        ipAddresses = new TreeMap<>();
+    }
+
+    public void Clear()
+    {
+        ipAddresses.clear();
+    }
+
+    public int AddIPAddress(String ipToAdd)
+    {
+        if (ipAddresses.containsKey(ipToAdd))
+        {
+            // Already present so increment the integer value.
+            Integer count = ipAddresses.get(ipToAdd);
+            count++;
+            ipAddresses.put(ipToAdd, count);
+        }
+        else // first of this particular IP address to go in the list.
+        {
+            ipAddresses.put(ipToAdd, 1);
+        }
+
+        // Return the count so far for this IP address.
+        return ipAddresses.get(ipToAdd);
+    }
+
+    // Accessors
+    public int CountIPAddress(String ip)
+    {
+        Integer count;
+        if (ipAddresses.containsKey(ip))
+        {
+            count = ipAddresses.get(ip);
+        }
+        else // not found
+        {
+            count = 0;
+        }
+        return count;
+    }
+
+    public int Size()
+    {
+        return ipAddresses.size();
+    }
+
+    public String ToString()
+    {
+        return ipAddresses.toString();
+    }
+
+    // Class members
+    private TreeMap<String, Integer> ipAddresses;
+}
