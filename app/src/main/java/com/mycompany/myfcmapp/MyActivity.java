@@ -307,6 +307,9 @@ class FCMIPAddresses
 {
     public FCMIPAddresses()
     {
+        // I wanted to explicitly state this is a Key=String, Value=Integer
+        // TreeMap, but Android Studio warned I should use <> rather than
+        // <String, Integer>. Feels like a lack of type safety to an oldie like me.
         ipAddresses = new TreeMap<>();
     }
 
