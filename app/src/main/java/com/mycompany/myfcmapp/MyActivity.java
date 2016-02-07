@@ -115,12 +115,12 @@ public class MyActivity extends ActionBarActivity
 
             // OK, that is enough hacking. NEXT ...
             // * DONE. Learn how to define functions on this class.
-            // * Learn how to define new classes.
-            // * Create a class that extracts the pub/sub IP address
+            // * DONE. Learn how to define new classes.
+            // * DONE. Create a class that extracts the pub/sub IP address
             // * Find a data structure that can store IP addresses with efficient look up
             //   i.e. if (listOfIPs.exists("10.30.75.14")) { // do stuff };
             // * And can count its entries, i.e. listOfIPs.count().
-            // * Learn to write unit tests for classes written.
+            // * DONE. Learn to write unit tests for classes written.
             // * DONE. Learn how to use GitHub for source control.
 
             while (((fcmLine = fcmReadBuf.readLine()) != null)
@@ -216,17 +216,13 @@ class FCMLineParser
     {
         lineType = ' ';
         ip = "0.0.0.0";
-        line = "";
-    }
+     }
 
-    public void SetLine(String fcmLine)
-    {
-        line = fcmLine;
-    }
-
-    // Parse a line passed in as a string
+       // Parse a line passed in as a string
     public void Parse(String line)
     {
+        // New line to parse so reset variables.
+        this.Reset();
         // If first char is a P, set type, extract IP, etc
         lineType = line.charAt(0);
         switch (lineType)
@@ -246,9 +242,45 @@ class FCMLineParser
         if (lineType == 'P' || lineType == 'S')
         {
             // Extract IP address from line.
-            // Dummy it for now.
-            ip = "192.168.2.1";
-        }
+
+            int idx = 1;
+            int startIdx = -1;
+            char nextChar;
+            // Find start of IP address, this is the start index.
+            while (idx < line.length())
+            {
+                nextChar = line.charAt(idx);
+                // Check if it is a digit.
+                if (nextChar >= '0' && nextChar <= '9')
+                {
+                    startIdx = idx;
+                    // Start found, break from while loop.
+                    break;
+                }
+                idx++;
+             }
+
+            // Iterate until ':' found, the true end index is one less, but substring takes care
+            // of that.
+            int endIdx = 0;
+            while (idx < line.length())
+            {
+                 if (line.charAt(idx) == ':')
+                {
+                    endIdx = idx;
+                    // End found, break from while loop
+                    break;
+                }
+                idx++;
+            }
+
+            // Extract the IP address substring.
+            final int minIpLen = 7;
+            if (startIdx >=0 && (endIdx - startIdx + 1) >= minIpLen)
+            {
+                ip = line.substring(startIdx, endIdx);
+            }
+         }
     }
 
     // Accessors
@@ -265,5 +297,4 @@ class FCMLineParser
     // Class variables
     protected char      lineType;
     protected String    ip;
-    protected String    line;
-}
+  }
