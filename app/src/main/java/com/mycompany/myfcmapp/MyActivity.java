@@ -68,15 +68,15 @@ public class MyActivity extends ActionBarActivity
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state))
         {
-            message = "WRITE and READ: " + message;
+            message += "WRITE and READ: ";
         }
         else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state))
         {
-            message = "READ ONLY: " + message;
+            message += "READ ONLY: ";
         }
         else
         {
-            message = "INACCESSIBLE: " + message;
+            message += "INACCESSIBLE: ";
         }
 
         // Notes: suggest reading files from DIRECTORY_DOWNLOADS and writing
@@ -87,70 +87,43 @@ public class MyActivity extends ActionBarActivity
                 Environment.DIRECTORY_DOWNLOADS),"FCM");
         // And a path for the file.
         File fcmFile = new File(fcmFileDir, fcmFileName);
-        message = fcmFile.toString() + " : " + message;
+        message += fcmFile.toString() + " : ";
 
         if (fcmFileDir.mkdirs())
         {
             // The directory including path has been created.
-            message = "mkdirs=true : " + message;
-
+            message += "mkdirs=true : ";
         }
         else
         {
             // The directory already existed or there was a problem.
-            message = "mkdirs=false : " + message;
+            message += "mkdirs=false : ";
         }
 
-        // Write some data to it
         try
         {
             // Open the file
             BufferedReader fcmReadBuf = new BufferedReader(new FileReader(fcmFile));
-            // Get the data out and add it into message.
-            String fcmLine;
-            final int MAX_LINES = 100000;
-            int lineNumber = 0;
-            int pubLines = 0;
-            int subLines = 0;
-            int otherLines = 0;
-            char char1;
+            FCMFileAnalyzer analyzer = new FCMFileAnalyzer(fcmReadBuf);
+            analyzer.Analyze();
+            message += "\n";
+            message += analyzer.StatsString();
+        }
+        catch (IOException e)
+        {
+            message += "IO exception[" + e.getMessage() + "]: ";
+        }
 
             // OK, that is enough hacking. NEXT ...
             // * DONE. Learn how to define functions on this class.
             // * DONE. Learn how to define new classes.
             // * DONE. Create a class that extracts the pub/sub IP address
-            // * Find a data structure that can store IP addresses with efficient look up
+            // * DONE. Find a data structure that can store IP addresses with efficient look up
             //   i.e. if (listOfIPs.exists("10.30.75.14")) { // do stuff };
             // * And can count its entries, i.e. listOfIPs.count().
             // * DONE. Learn to write unit tests for classes written.
             // * DONE. Learn how to use GitHub for source control.
 
-            while (((fcmLine = fcmReadBuf.readLine()) != null)
-                    && lineNumber < MAX_LINES)
-            {
-                char1 = fcmLine.charAt(0);
-                switch (char1)
-                {
-                    case 'P': pubLines++;
-                        break;
-                    case 'S': subLines++;
-                        break;
-                    default: otherLines++;
-                        break;
-                }
-                lineNumber++;
-            }
-            message = String.format("#Pub/Sub lines = %d/%d \n",pubLines, subLines) + message;
-            message = String.format("#Lines/other = %d/%d \n", lineNumber, otherLines) + message;
-
-            // Close the file
-            fcmReadBuf.close();
-        }
-        catch (IOException e)
-        {
-            message = "IO exception[" + e.getMessage() + "]: " + message;
-        }
-        // ********************************************************************
         return message;
     }
 
@@ -206,6 +179,99 @@ public class MyActivity extends ActionBarActivity
 }
 
 // Helper classes
+class FCMFileAnalyzer
+{
+    public FCMFileAnalyzer(BufferedReader fcmReadBuf)
+    {
+        // Set all the stats variables to initial states.
+        _totalLines = 0;
+        _pubLines = 0;
+        _subLines = 0;
+        _otherLines = 0;
+        _lineParser = new FCMLineParser();
+        _pubIpAddresses = new FCMIPAddresses();
+        _subIpAddresses = new FCMIPAddresses();
+        _readBuf = fcmReadBuf;
+    }
+
+    // Analyzes file and then closes the file.
+    public boolean Analyze()
+    {
+        boolean ret;
+        try
+        {
+            String fcmLine;
+            int lineNumber = 0;
+
+            while (((fcmLine = _readBuf.readLine()) != null)
+                    && lineNumber < MAX_LINES)
+            {
+                _lineParser.Parse(fcmLine);
+                switch (_lineParser.GetLineType())
+                {
+                    case 'P':
+                        _pubLines++;
+                        _pubIpAddresses.AddIPAddress(_lineParser.GetIPAddress());
+                        break;
+                    case 'S':
+                        _subLines++;
+                        _subIpAddresses.AddIPAddress(_lineParser.GetIPAddress());
+                        break;
+                    default: _otherLines++;
+                        break;
+                }
+                lineNumber++;
+                _lineParser.Reset();
+            }
+            _totalLines = lineNumber;
+
+            // Close the file
+            _readBuf.close();
+            ret = true;
+        }
+        catch (IOException e)
+        {
+            _errorMsg = "IO exception[" + e.getMessage() + "]: " + _errorMsg;
+            ret = false;
+        }
+        return ret;
+    }
+
+    // Output stats string in a form suitable for the screen.
+    public String StatsString()
+    {
+        String statsString;
+
+        statsString = _errorMsg;
+        statsString += String.format("#Lines = %d\n", _totalLines);
+        statsString += String.format("#Pub lines = %d\n#Sub lines = %d\n", _pubLines, _subLines);
+        statsString += String.format("#Other lines = %d\n", _otherLines);
+
+        statsString += String.format("#Pub ip addresses = %d\n", _pubIpAddresses.Size());
+        statsString += String.format("#Sub ip addresses = %d\n", _subIpAddresses.Size());
+
+        statsString += "\nPub ip addresses with occurrence count:\n";
+        statsString += _pubIpAddresses.ToString();
+        statsString += "\nSub ip addresses with occurrence count:\n";
+        statsString += _subIpAddresses.ToString();
+        statsString += "\n End of stats.\n";
+
+        return statsString;
+    }
+
+    // Protected variables
+    protected final static int MAX_LINES = 100000;
+    protected int _totalLines;
+    protected int _pubLines;
+    protected int _subLines;
+    protected int _otherLines;
+    protected FCMLineParser _lineParser;
+    protected FCMIPAddresses _pubIpAddresses;
+    protected FCMIPAddresses _subIpAddresses;
+    protected BufferedReader _readBuf;
+    protected String _errorMsg;
+}
+
 class FCMLineParser
 {
     public FCMLineParser()
