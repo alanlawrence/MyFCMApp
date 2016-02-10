@@ -29,7 +29,7 @@ public class MyActivity extends ActionBarActivity
 {
     // Defining a class static used as a key name in the Intent class.
     // I don't know what 'final' means but the rest is exactly the same
-    // as a C++ class static variable declaration
+    // as a C++ class static variable declaration. Answer: finals makes it const.
     public final static String EXTRA_MESSAGE = "com.mycompany.myfcmapp.MESSAGE";
     // The text immediately below refers to the static variable declaration above.
     // For the next activity to query the extra data, you should define the key for your

@@ -3,6 +3,7 @@ package com.mycompany.myfcmapp;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -33,6 +34,10 @@ public class DisplayMessageActivity extends ActionBarActivity
         TextView textView = new TextView(this);
         textView.setTextSize(20);
         textView.setText(message);
+
+        // This together with setting the scrollbars="vertical" TextView
+        // xml attribute allows the text view to be scrolled vertically.
+        textView.setMovementMethod(new ScrollingMovementMethod());
 
         // Then add the TextView as the root view of the activity’s layout by passing
         // it to setContentView().
