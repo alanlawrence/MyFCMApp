@@ -1,12 +1,19 @@
 package com.mycompany.myfcmapp;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-// Work out how to rename this file and class to FCMIPAddressesTest.
-public class FCMIPAddressTest extends TestCase
-{
+import static org.junit.Assert.*;
 
+public class FCMIPAddressesTest {
+
+    @Test
+    public void testClear() throws Exception
+    {
+        // Add a test if implementation changes from simply wrapping TreeMap.
+    }
+
+    @Test
     public void testAddIPAddress() throws Exception
     {
         FCMIPAddresses ipAddresses = new FCMIPAddresses();
@@ -28,6 +35,7 @@ public class FCMIPAddressTest extends TestCase
         Assert.assertEquals(ipAddresses.CountIPAddress(ip), 2);
     }
 
+    @Test
     public void testCountIPAddress() throws Exception
     {
         // Now test behaviour for an IP that is not present in the list
@@ -36,5 +44,17 @@ public class FCMIPAddressTest extends TestCase
         ipAddresses.AddIPAddress("10.20.21.22");
         String ip = "10.17.18.19";
         Assert.assertEquals(ipAddresses.CountIPAddress(ip), 0);
+    }
+
+    @Test
+    public void testSize() throws Exception
+    {
+        // Add a test if implementation changes from simply wrapping TreeMap.
+    }
+
+    @Test
+    public void testToString() throws Exception
+    {
+        // Add a test if implementation changes from simply wrapping TreeMap.
     }
 }

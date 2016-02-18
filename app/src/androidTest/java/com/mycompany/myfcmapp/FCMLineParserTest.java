@@ -1,14 +1,13 @@
 package com.mycompany.myfcmapp;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-/**
- * Created by Alan-Gill on 07/02/2016.
- */
-public class FCMLineParserTest extends TestCase
-{
+import static org.junit.Assert.*;
 
+public class FCMLineParserTest {
+
+    @Test
     public void testReset() throws Exception
     {
         FCMLineParser parser = new FCMLineParser();
@@ -23,8 +22,9 @@ public class FCMLineParserTest extends TestCase
         parser.Reset();
         Assert.assertEquals(' ', parser.GetLineType());
         Assert.assertEquals("0.0.0.0", parser.GetIPAddress());
-     }
+    }
 
+    @Test
     public void testParse() throws Exception
     {
         FCMLineParser parser = new FCMLineParser();
@@ -48,11 +48,13 @@ public class FCMLineParserTest extends TestCase
         Assert.assertEquals("0.0.0.0", parser.GetIPAddress());
     }
 
+    @Test
     public void testGetLineType() throws Exception
     {
         // Tests covered in the testParse method.
     }
 
+    @Test
     public void testGetIPAddress() throws Exception
     {
         // Tests covered in the testParse method.
