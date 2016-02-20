@@ -1,9 +1,8 @@
 package com.mycompany.myfcmapp;
 
 import android.os.Environment;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -15,17 +14,13 @@ import android.view.View;
 import android.widget.EditText;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.TreeMap;
 
 
-public class MyActivity extends ActionBarActivity
+public class MyActivity extends AppCompatActivity
 {
     // Defining a class static used as a key name in the Intent class.
     // I don't know what 'final' means but the rest is exactly the same
@@ -58,7 +53,8 @@ public class MyActivity extends ActionBarActivity
     String AnalyseFCM(String fcmFileName)
     {
         // I am assuming that String supports copy on write. Seems to.
-        String message = fcmFileName;
+        String message = "Analysis of file: [" + fcmFileName + "]\n";
+        message += "External storage status: ";
 
         // ********************************************************************
         // Experimental file reading code.
@@ -68,15 +64,15 @@ public class MyActivity extends ActionBarActivity
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state))
         {
-            message += "WRITE and READ: ";
+            message += "WRITE and READ.\n";
         }
         else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state))
         {
-            message += "READ ONLY: ";
+            message += "READ ONLY.\n";
         }
         else
         {
-            message += "INACCESSIBLE: ";
+            message += "INACCESSIBLE.\n";
         }
 
         // Notes: suggest reading files from DIRECTORY_DOWNLOADS and writing
@@ -87,18 +83,7 @@ public class MyActivity extends ActionBarActivity
                 Environment.DIRECTORY_DOWNLOADS),"FCM");
         // And a path for the file.
         File fcmFile = new File(fcmFileDir, fcmFileName);
-        message += fcmFile.toString() + " : ";
-
-        if (fcmFileDir.mkdirs())
-        {
-            // The directory including path has been created.
-            message += "mkdirs=true : ";
-        }
-        else
-        {
-            // The directory already existed or there was a problem.
-            message += "mkdirs=false : ";
-        }
+        message += "Reading file from: [" + fcmFile.toString() + "]\n";
 
         try
         {
@@ -120,7 +105,7 @@ public class MyActivity extends ActionBarActivity
             // * DONE. Create a class that extracts the pub/sub IP address
             // * DONE. Find a data structure that can store IP addresses with efficient look up
             //   i.e. if (listOfIPs.exists("10.30.75.14")) { // do stuff };
-            // * And can count its entries, i.e. listOfIPs.count().
+            // * DONE. And can count its entries, i.e. listOfIPs.count().
             // * DONE. Learn to write unit tests for classes written.
             // * DONE. Learn how to use GitHub for source control.
 
@@ -192,6 +177,7 @@ class FCMFileAnalyzer
         _pubIpAddresses = new FCMIPAddresses();
         _subIpAddresses = new FCMIPAddresses();
         _readBuf = fcmReadBuf;
+        _errorMsg = null;
     }
 
     // Analyzes file and then closes the file.
@@ -203,8 +189,8 @@ class FCMFileAnalyzer
             String fcmLine;
             int lineNumber = 0;
 
-            while (((fcmLine = _readBuf.readLine()) != null)
-                    && lineNumber < MAX_LINES)
+            fcmLine = _readBuf.readLine();
+            while (fcmLine != null && lineNumber < MAX_LINES)
             {
                 _lineParser.Parse(fcmLine);
                 switch (_lineParser.GetLineType())
@@ -222,6 +208,8 @@ class FCMFileAnalyzer
                 }
                 lineNumber++;
                 _lineParser.Reset();
+                // Get next line ...
+                fcmLine = _readBuf.readLine();
             }
             _totalLines = lineNumber;
 
@@ -238,25 +226,43 @@ class FCMFileAnalyzer
     }
 
     // Output stats string in a form suitable for the screen.
-    public String StatsString()
-    {
-        String statsString;
+    public String StatsString() {
+        String statsString = "";
 
-        statsString = _errorMsg;
-        statsString += String.format("#Lines = %d\n", _totalLines);
+        // Prepend the error message if there is one.
+        if (_errorMsg != null) statsString += ("Error message: [" +_errorMsg + "]\n");
+
+        // Start line ...
+        statsString += "Start stats ...\n";
+
+        // Line counts ...
+        statsString += String.format("#Lines = %d", _totalLines);
+        if (_totalLines == MAX_LINES) statsString += " (= MAX LINES)";
+        statsString += "\n";
+
         statsString += String.format("#Pub lines = %d\n#Sub lines = %d\n", _pubLines, _subLines);
         statsString += String.format("#Other lines = %d\n", _otherLines);
 
+        // Total ip address counts ...
         statsString += String.format("#Pub ip addresses = %d\n", _pubIpAddresses.Size());
         statsString += String.format("#Sub ip addresses = %d\n", _subIpAddresses.Size());
 
+        // List of ip addresses and counts for each ...
         statsString += "\nPub ip addresses with occurrence count:\n";
         statsString += _pubIpAddresses.ToString();
         statsString += "\nSub ip addresses with occurrence count:\n";
         statsString += _subIpAddresses.ToString();
-        statsString += "\n End of stats.\n";
+
+        // That's all folks !
+        statsString += "\n... end of stats.\n";
 
         return statsString;
+    }
+
+    // Accessors to support unit testing.
+    public int MaxLines()
+    {
+        return MAX_LINES;
     }
 
     // Protected variables

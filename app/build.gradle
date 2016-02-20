@@ -29,6 +29,9 @@ android {
     }
 }
 
+// Added this dependency as recommended in the vogella Mockito tutorial.
+repositories { jcenter() }
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
@@ -37,9 +40,12 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     androidTestCompile 'com.android.support:support-annotations:23.1.1'
 
-    // For unit testing with Junit 4 and Mockito
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.10.19'
+    // For unit testing with Junit 4 and Mockito.
+    // Need the androidTestCompile instrumentation unit tests, which I think means running on a
+    // device (an LG G3 in my case).
+    androidTestCompile 'junit:junit:4.12'
+    // Remember to specify androidTestCompile not just testCompile.
+    androidTestCompile 'org.mockito:mockito-core:1.10.19'
     //To use the Android Testing Support Library in your Gradle project, add these dependencies
     // in your build.gradle file:
     androidTestCompile 'com.android.support.test:runner:0.4'
@@ -49,6 +55,14 @@ dependencies {
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
     // Set this dependency to build and run UI Automator tests
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
+    // Add these as advised in the vogella Mockito tutorial.
+    androidTestCompile "com.google.dexmaker:dexmaker:1.2"
+    androidTestCompile "com.google.dexmaker:dexmaker-mockito:1.2"
+
+    // the following is required to use Mockito and JUnit for your unit
+    // tests on the JVM
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.10.19'
 }
 
 
