@@ -14,11 +14,18 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+            testCoverageEnabled true       }
     }
+
     productFlavors {
     }
 
@@ -59,8 +66,11 @@ dependencies {
     androidTestCompile "com.google.dexmaker:dexmaker:1.2"
     androidTestCompile "com.google.dexmaker:dexmaker-mockito:1.2"
 
-    // the following is required to use Mockito and JUnit for your unit
+    // Local unit tests.
+    // The following is required to use Mockito and JUnit for your unit
     // tests on the JVM
+    // See https://codelabs.developers.google.com/codelabs/android-testing/index.html?index=..%2F..%2Findex#5
+    // for how to use variables to define version numbers for easier maintenance.
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
 }
