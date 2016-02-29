@@ -5,12 +5,22 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class FCMIPAddressesTest {
+public class FCMIPAddressesTestLocal {
 
     @Test
     public void testClear() throws Exception
     {
         // Add a test if implementation changes from simply wrapping TreeMap.
+        // Test added to cover the line.
+        FCMIPAddresses ipAddresses = new FCMIPAddresses();
+        String ip = "10.11.12.14";
+        ipAddresses.AddIPAddress(ip);
+        Assert.assertEquals(ipAddresses.Size(), 1);
+        Assert.assertEquals(ipAddresses.CountIPAddress(ip), 1);
+
+        ipAddresses.Clear();
+        Assert.assertEquals(ipAddresses.Size(), 0);
+        Assert.assertEquals(ipAddresses.CountIPAddress(ip), 0);
     }
 
     @Test
