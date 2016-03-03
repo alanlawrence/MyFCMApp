@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 //import static org.junit.Assert.assertNotNull;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 
 public class FCMFileAnalyzerTestLocal {
 
@@ -129,7 +130,8 @@ public class FCMFileAnalyzerTestLocal {
 
         // Construct an FCMFileAnalyser with the mock ReadBuffer object.
         FCMFileAnalyzer analyzer = new FCMFileAnalyzer(mockBufReader);
-        analyzer.Analyze();
+        boolean ok = analyzer.Analyze();
+        Assert.assertEquals(true, ok);
 
         // Call StatsString to see if the output is correct.
         // First build expected response.
@@ -148,6 +150,43 @@ public class FCMFileAnalyzerTestLocal {
 
         Assert.assertEquals(statsString, analyzer.StatsString());
     }
+
+    // Test the output when an exception is thrown on the first readLine call.
+    @Test
+    public void testForIOException() throws Exception
+    {
+        // Create a mock ReadBuffer object.
+        BufferedReader mockBufReader = Mockito.mock(BufferedReader.class);
+
+        String errorMsg = "Mocked IOException";
+        Mockito.doThrow(new IOException(errorMsg)).when(mockBufReader).readLine();
+
+        // Construct an FCMFileAnalyser with the mock ReadBuffer object.
+        FCMFileAnalyzer analyzer = new FCMFileAnalyzer(mockBufReader);
+        boolean ok = analyzer.Analyze();
+        Assert.assertEquals(false, ok);
+
+        // Call StatsString to see if the output is correct.
+        // First build expected response.
+        String statsString = "Error message: [IOException[" + errorMsg + "]. ]\n";
+
+        statsString += "Start stats ...\n";
+        statsString += "#Lines = 0\n";
+        statsString += "#Pub lines = 0\n#Sub lines = 0\n";
+        statsString += "#Other lines = 0\n";
+        statsString += "#Pub ip addresses = 0\n";
+        statsString += "#Sub ip addresses = 0\n";
+
+        statsString += "\nPub ip addresses with occurrence count:\n";
+        statsString += "{}";
+        statsString += "\nSub ip addresses with occurrence count:\n";
+        statsString += "{}";
+        statsString += "\n... end of stats.\n";
+
+        String analyzerStatsString = analyzer.StatsString();
+        Assert.assertEquals(statsString, analyzerStatsString);
+    }
+
 
     @Test
     public void testStatsString() throws Exception

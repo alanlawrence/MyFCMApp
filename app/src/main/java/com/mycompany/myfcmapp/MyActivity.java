@@ -219,14 +219,16 @@ class FCMFileAnalyzer
         }
         catch (IOException e)
         {
-            _errorMsg = "IO exception[" + e.getMessage() + "]: " + _errorMsg;
+            if (_errorMsg == null) _errorMsg = "";
+            _errorMsg += "IOException[" + e.getMessage() + "]. ";
             ret = false;
         }
         return ret;
     }
 
     // Output stats string in a form suitable for the screen.
-    public String StatsString() {
+    public String StatsString()
+    {
         String statsString = "";
 
         // Prepend the error message if there is one.
