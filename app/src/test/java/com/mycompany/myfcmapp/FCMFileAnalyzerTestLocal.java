@@ -151,6 +151,58 @@ public class FCMFileAnalyzerTestLocal {
         Assert.assertEquals(statsString, analyzer.StatsString());
     }
 
+    @Test
+    public void testRepeatedPubSingleSubs() throws Exception
+    {
+        // Create a mock ReadBuffer object.
+        BufferedReader mockBufReader = Mockito.mock(BufferedReader.class);
+
+        // TEST: Repeat the same IP address multiple times for Pub lines.
+        //       List different IP addresses for each Sub line.
+        Mockito.when(mockBufReader.readLine()).thenReturn
+                (
+                        "P 10.30.75.11:55749\n",
+                        "P 10.30.75.11:55750\n",
+                        "P 10.30.75.11:55751\n",
+                        "P 10.30.75.11:55752\n",
+                        "P 10.30.75.11:55753\n",
+                        "S 10.31.76.12:55750\n",
+                        "S 10.31.76.13:55750\n",
+                        "S 10.31.76.14:55750\n",
+                        "S 10.31.76.15:55750\n",
+                        "S 10.31.76.16:55750\n",
+                        "S 10.31.76.17:55750\n",
+                        null
+                );
+
+        // Automatic due to function prototype returning void, so no need to write this ...
+        //Mockito.when(mockBufReader.close()).thenReturn(void);
+
+        // Construct an FCMFileAnalyser with the mock ReadBuffer object.
+        FCMFileAnalyzer analyzer = new FCMFileAnalyzer(mockBufReader);
+        boolean ok = analyzer.Analyze();
+        Assert.assertEquals(true, ok);
+
+        // Call StatsString to see if the output is correct.
+        // First build expected response.
+        String statsString = "Start stats ...\n";
+        statsString += "#Lines = 11\n";
+        statsString += "#Pub lines = 5\n#Sub lines = 6\n";
+        statsString += "#Other lines = 0\n";
+        statsString += "#Pub ip addresses = 1\n";
+        statsString += "#Sub ip addresses = 6\n";
+
+        statsString += "\nPub ip addresses with occurrence count:\n";
+        statsString += "{10.30.75.11=5}";
+        statsString += "\nSub ip addresses with occurrence count:\n";
+        statsString += "{10.31.76.12=1, 10.31.76.13=1, 10.31.76.14=1, 10.31.76.15=1, ";
+        statsString +=  "10.31.76.16=1, 10.31.76.17=1}";
+        statsString += "\n... end of stats.\n";
+
+        Assert.assertEquals(statsString, analyzer.StatsString());
+    }
+
+
     // Test the output when an exception is thrown on the first readLine call.
     @Test
     public void testForIOException() throws Exception
